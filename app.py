@@ -4,7 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from config import MODEL_DIR
-from titanic_model import TitanicDNNModel, train_and_save_model
+from titanic_model import TitanicModel, train_and_save_model
 from database import TitanicDatabase
 import time
 
@@ -14,13 +14,12 @@ plt.rcParams['axes.unicode_minus'] = False
 
 @st.cache_resource
 def load_model():
-    model_path = os.path.join(MODEL_DIR, 'titanic_dnn_model.keras')
-    preprocessor_path = os.path.join(MODEL_DIR, 'titanic_dnn_model_preprocessor.pkl')
+    model_path = os.path.join(MODEL_DIR, 'titanic_rf_model.pkl')
     accuracy_path = os.path.join(MODEL_DIR, 'model_accuracy.txt')
     
-    if os.path.exists(model_path) and os.path.exists(preprocessor_path):
+    if os.path.exists(model_path):
         try:
-            model = TitanicDNNModel.load(model_path, preprocessor_path)
+            model = TitanicModel.load(model_path)
             
             # 加载模型准确率
             model.accuracy = None
@@ -120,8 +119,7 @@ def show_prediction_page(model, db):
             }
         
             df = pd.DataFrame([passenger_data])
-            X = model.preprocessor.transform(df)
-            survival_prob = model.predict(X)[0]
+            survival_prob = model.predict_proba(df)[0]
             
             time.sleep(0.5)
             
@@ -175,11 +173,8 @@ def show_batch_prediction_page(model, db):
             # 批量预测
             if st.button("开始批量预测", type="primary"):
                 with st.spinner("正在批量预测..."):
-                    # 预处理数据
-                    X = model.preprocessor.transform(df)
-                    
                     # 预测
-                    probabilities = model.predict(X)
+                    probabilities = model.predict_proba(df)
                     
                     # 添加预测结果
                     df['SurvivalProbability'] = probabilities
