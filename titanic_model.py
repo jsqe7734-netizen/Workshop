@@ -8,6 +8,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from sklearn.impute import SimpleImputer
 
 class TitanicModel:
     def __init__(self):
@@ -73,8 +74,6 @@ class TitanicModel:
         return instance
 
 def train_and_save_model():
-    from sklearn.impute import SimpleImputer
-    
     data_path = os.path.join(os.path.dirname(__file__), 'data', 'Titanic生存率', 'mytrain.csv')
     df = pd.read_csv(data_path)
     
